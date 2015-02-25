@@ -1,0 +1,31 @@
+users
+-----------
+id
+common name
+-----------
+
+emails
+-----------
+id
+email 
+user_id (foreign key)users.id
+-----------
+index(email)
+
+replies
+-----------
+id
+user_id (foreign key)users.id
+active
+from_date
+to_date
+reply
+-----------
+
+sent_replies
+-----------
+id,
+user_id (foreign key)users.id
+from
+date
+-----------

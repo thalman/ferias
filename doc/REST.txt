@@ -1,0 +1,34 @@
+REST API specification
+======================
+
+Is autoreply active
+-------------------
+QUERY:
+/active?email=john.doe@mail.com
+REPLY:
+active is 1 (active) or 0 (not active)
+EXAMPLE:
+{ "active" : 1 }
+
+Should a reply be send
+----------------------
+QUERY:
+/sendreply?from=john.doe@mail.com&to=smith@mail.com
+REPLY:
+EXAMPLE:
+{ "sendreply" : 1, "mailbody" : "WEYQIJFKWEUIQ48RTE7TE3568==" }
+{ "sendreply" : 0 }
+
+Reply has been sent
+-------------------
+QUERY:
+/sendreply?from=john.doe@mail.com&to=smith@mail.com&replysent=1
+{ "processed" : 1 }
+{ "processed" : 0, "msg" : "Failed to connect to the database" }
+
+Set autoreply (authentized)
+---------------------------
+/setreply?fromdate=XXX&todate=YYYY&text=DQFR94WERG54...GGD==
+{ "processed" : 1 }
+{ "processed" : 0, "msg" : "Invalid date" }
+
