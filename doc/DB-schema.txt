@@ -1,31 +1,33 @@
-users
------------
-id
-common name
------------
+create table 'users' (
+    'id' INTEGER PRIMARY KEY ASC,
+    'name' VARCHAR(25)
+);
 
-emails
------------
-id
-email 
-user_id (foreign key)users.id
------------
-index(email)
+create table 'emails' (
+    'id' INTEGER PRIMARY KEY ASC,
+    'email' varchar(50) unique,
+    'user_id' INTEGER,
+    FOREIGN KEY ('user_id') REFERENCES users('id')
+);
 
-replies
------------
-id
-user_id (foreign key)users.id
-active
-from_date
-to_date
-reply
------------
+create table 'replies' (
+    'id' INTEGER PRIMARY KEY ASC,
+    'user_id' INTEGER UNIQUE,
+    'active' INTEGER,
+    'from_date' INTEGER,
+    'to_date' INTEGER,
+    'subject' VARCHAR(255),
+    'body' VARCHAR(1024),
+    FOREIGN KEY ('user_id') REFERENCES users('id')
+);
+CREATE INDEX 'replies_user_id_idx' ON replies ('user_id');
 
-sent_replies
------------
-id,
-user_id (foreign key)users.id
-from
-date
------------
+create table 'sent_replies' (
+    'id' INTEGER PRIMARY KEY ASC,
+    'user_id' INTEGER UNIQUE,
+    'from' VARCHAR(255),
+    'date' INTEGER,
+    FOREIGN KEY ('user_id') REFERENCES users('id')
+);
+CREATE INDEX 'sent_replies_email_idx' ON sent_replies ('from');
+

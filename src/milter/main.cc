@@ -1,28 +1,35 @@
 #include <libmilter/mfapi.h>
-#include "milterprivate.h"
+#include <string.h>
+
+#include "feriasmilter.h"
 
 /**
  * milter documentation http://www.elandsys.com/resources/sendmail/libmilter/api.html
  */
 
 sfsistat ferias_envfrom (SMFICTX *ctx, char **argv) {
-    MilterPrivateData *milter = (MilterPrivateData *)smfi_getpriv (ctx);
+    FeriasMilter *milter = (FeriasMilter *)smfi_getpriv (ctx);
     if (milter) delete milter;
-    milter = new MilterPrivateData();
+    milter = new FeriasMilter();
+    milter->from(argv[0]);
     smfi_setpriv (ctx, milter);
     return SMFIS_CONTINUE;
 }
 
 sfsistat ferias_envrcpt (SMFICTX *ctx, char **argv) {
+    FeriasMilter *milter = (FeriasMilter *)smfi_getpriv (ctx);
+    if (milter) milter->rcpt (argv[0]);    
     return SMFIS_CONTINUE;
 }
 
 sfsistat ferias_header (SMFICTX *ctx, char *headerf, char *headerv) {
+    FeriasMilter *milter = (FeriasMilter *)smfi_getpriv (ctx);
+    if (milter) milter->header(headerf);
     return SMFIS_CONTINUE;
 }
 
 sfsistat ferias_abort (SMFICTX *ctx) {
-    MilterPrivateData *milter = (MilterPrivateData *)smfi_getpriv (ctx);
+    FeriasMilter *milter = (FeriasMilter *)smfi_getpriv (ctx);
     if (milter) {
         delete milter;
         smfi_setpriv (ctx, NULL);
@@ -31,11 +38,11 @@ sfsistat ferias_abort (SMFICTX *ctx) {
 }
 
 sfsistat ferias_eom (SMFICTX *ctx) {
-    MilterPrivateData *milter = (MilterPrivateData *)smfi_getpriv (ctx);
+    FeriasMilter *milter = (FeriasMilter *)smfi_getpriv (ctx);
     if (milter) {
-        delete milter;
-        // send message
+        milter->sendAutoreply();
         smfi_setpriv (ctx, NULL);
+        delete milter;
     }
     return SMFIS_CONTINUE;
 }
@@ -61,10 +68,11 @@ struct smfiDesc feriasMilter =
 
 int main (int argc, char *argv[])
 {
+    smfi_setconn ((char *)"unix:./ferias.sock");
     if (smfi_register(feriasMilter) == MI_FAILURE) {
-        fprintf(stderr, "smfi_register failed\n");
+        fprintf (stderr, "smfi_register failed\n");
         return 1;
     }
-    return 0;
+    return smfi_main();
 }
 

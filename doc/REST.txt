@@ -4,7 +4,7 @@ REST API specification
 Is autoreply active
 -------------------
 QUERY:
-/active?email=john.doe@mail.com
+GET /active/john.doe@mail.com
 REPLY:
 active is 1 (active) or 0 (not active)
 EXAMPLE:
@@ -13,7 +13,7 @@ EXAMPLE:
 Should a reply be send
 ----------------------
 QUERY:
-/sendreply?from=john.doe@mail.com&to=smith@mail.com
+GET /sendreply/john.doe@mail.com/smith@mail.com
 REPLY:
 EXAMPLE:
 { "sendreply" : 1, "mailbody" : "WEYQIJFKWEUIQ48RTE7TE3568==" }
@@ -22,13 +22,21 @@ EXAMPLE:
 Reply has been sent
 -------------------
 QUERY:
-/sendreply?from=john.doe@mail.com&to=smith@mail.com&replysent=1
+POST /sendreply/john.doe@mail.com/smith@mail.com
 { "processed" : 1 }
 { "processed" : 0, "msg" : "Failed to connect to the database" }
 
 Set autoreply (authentized)
 ---------------------------
-/setreply?fromdate=XXX&todate=YYYY&text=DQFR94WERG54...GGD==
+POST /setreply
+{
+    "subject": "Autoreply: I'm out of office",
+    "body": "I will be back on may\nor later",
+    "from": "2015-03-25",
+    "to": "2015-03-28"
+}
+
+Reply
 { "processed" : 1 }
 { "processed" : 0, "msg" : "Invalid date" }
 
