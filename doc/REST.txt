@@ -4,39 +4,12 @@ REST API specification
 Is autoreply active
 -------------------
 QUERY:
-GET /active/john.doe@mail.com
+GET /autoreply/john.doe@mail.com
 REPLY:
 active is 1 (active) or 0 (not active)
 EXAMPLE:
-{ "active" : 1 }
+{ "active" : 1, "subject" : "I'm not in the office", body: "WEYQIJFKWEUIQ48RTE7TE3568==" }
+{ "active" : 0 }
 
-Should a reply be send
-----------------------
-QUERY:
-GET /sendreply/john.doe@mail.com/smith@mail.com
-REPLY:
-EXAMPLE:
-{ "sendreply" : 1, "mailbody" : "WEYQIJFKWEUIQ48RTE7TE3568==" }
-{ "sendreply" : 0 }
 
-Reply has been sent
--------------------
-QUERY:
-POST /sendreply/john.doe@mail.com/smith@mail.com
-{ "processed" : 1 }
-{ "processed" : 0, "msg" : "Failed to connect to the database" }
-
-Set autoreply (authentized)
----------------------------
-POST /setreply
-{
-    "subject": "Autoreply: I'm out of office",
-    "body": "I will be back on may\nor later",
-    "from": "2015-03-25",
-    "to": "2015-03-28"
-}
-
-Reply
-{ "processed" : 1 }
-{ "processed" : 0, "msg" : "Invalid date" }
 
