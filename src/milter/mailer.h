@@ -11,10 +11,10 @@ class Mailer {
     int _sock = -1;
     char _buf[BUFSIZ+1];
 
-    bool connected () { _sock != -1; };
+    bool connected () { return _sock != -1; };
     void write (const std::string& s);
     std::string read ();
-    void connect ();
+    bool connect ();
     void disconnect ();
 };
 

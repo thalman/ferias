@@ -23,12 +23,13 @@ void Mailer::write(const std::string& s)
 std::string Mailer::read()
 {
     if (! connected ()) return "";
+    memset(_buf, 0, BUFSIZ);
     size_t len = ::read(_sock, _buf, BUFSIZ);
     if (len) return _buf;
     return "";
 }
 
-void Mailer::connect()
+bool Mailer::connect()
 {
     struct addrinfo ai, *servinfo;
     if (connected ()) disconnect ();
@@ -37,7 +38,7 @@ void Mailer::connect()
     memset(&ai, 0, sizeof (ai));
     ai.ai_family = AF_INET;
     ai.ai_socktype = SOCK_STREAM;
-    if ((rv = getaddrinfo("127.0.0.1", "25", &ai, &servinfo)) != 0) return;
+    if ((rv = getaddrinfo("127.0.0.1", "25", &ai, &servinfo)) != 0) return connected ();
 
     for(addrinfo *p = servinfo; p != NULL; p = p->ai_next) {
         _sock = ::socket(p->ai_family, p->ai_socktype, p->ai_protocol);
@@ -52,6 +53,7 @@ void Mailer::connect()
         break;
     }
     freeaddrinfo (servinfo);
+    return connected ();
 }
 
 void Mailer::disconnect()
@@ -80,7 +82,7 @@ bool Mailer::send (const std::string& from, const std::string& to, const std::st
     write (DATA);
     read (); // end data with .\r\n
     write (mail.c_str ());
-    write (".\r\n");
+    write ("\r\n.\r\n");
     read (); 
     write (QUIT); // quit
     read (); // log off
