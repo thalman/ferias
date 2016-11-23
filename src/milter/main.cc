@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "feriasmilter.h"
+#include "configuration.h"
 
 /**
  * milter documentation http://www.elandsys.com/resources/sendmail/libmilter/api.html
@@ -68,7 +69,7 @@ struct smfiDesc feriasMilter =
 
 int main (int argc, char *argv[])
 {
-    smfi_setconn ((char *)"unix:./ferias.sock");
+    smfi_setconn ((char *)cfg_socket ());
     if (smfi_register(feriasMilter) == MI_FAILURE) {
         fprintf (stderr, "smfi_register failed\n");
         return 1;

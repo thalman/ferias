@@ -2,9 +2,13 @@
 #include "httpclient.h"
 #include "vsjson.h"
 #include "mailer.h"
+#include "configuration.h"
+
 #include <string.h>
 
 #define streq(X,Y) (strcmp(X,Y) == 0)
+
+FeriasMilter::FeriasMilter() : _base_url(cfg_base_url ()) { };
 
 std::string FeriasMilter::from () const {
     return _from;

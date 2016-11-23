@@ -6,13 +6,14 @@
 
 class FeriasMilter {
  public:
+    FeriasMilter();
     std::string from () const;
     void from (const char *from);
     void rcpt (const char *rcpt);
     void header (const char *header);
     void sendAutoreply();
  private:
-    std::string _base_url = "http://localhost";
+    std::string _base_url;
     std::string _from;
     std::vector <std::string> _to;
     bool _xautoreply = false;
