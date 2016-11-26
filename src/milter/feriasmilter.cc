@@ -27,7 +27,10 @@ void FeriasMilter::header (const char *header) {
     if (strcasecmp (header, "List-Id") == 0) {
         _mailinglist = true;
     }
-    if (strcasecmp (header, "X-Autoreply") == 0) {
+    if (
+        (strcasecmp (header, "X-Autoreply") == 0) ||
+        (strcasecmp (header, "X-Autorespond") == 0)
+    ) {
         _xautoreply = true;
     }
 }
@@ -119,7 +122,9 @@ void FeriasMilter::sendAutoreply() {
         std::string body;
         if (shouldSendAutoreply (to, subj, body)) {
             Mailer m;
-            std::string headers = "X-Autoreply: Yes\r\n";
+            std::string headers =
+                "X-Autoreply: auto-replied\r\n"
+                "X-Autorespond: auto-replied\r\n";
             m.send (_from, to, headers + subj + "\r\n\r\n" + body);
         }
     }
