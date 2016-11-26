@@ -22,7 +22,7 @@ void FeriasMilter::rcpt (const char *rcpt) {
     _to.push_back( rcpt );
 }
 
-void FeriasMilter::header (const char *header) {
+void FeriasMilter::header (const char *header, const char *value) {
     if (! header) return;
     if (strcasecmp (header, "List-Id") == 0) {
         _mailinglist = true;
@@ -30,6 +30,12 @@ void FeriasMilter::header (const char *header) {
     if (
         (strcasecmp (header, "X-Autoreply") == 0) ||
         (strcasecmp (header, "X-Autorespond") == 0)
+    ) {
+        _xautoreply = true;
+    }
+    if (
+        (strcasecmp (header, "Auto-Submitted") == 0) &&
+        (strstr (value, "auto-"))
     ) {
         _xautoreply = true;
     }
@@ -124,8 +130,10 @@ void FeriasMilter::sendAutoreply() {
             Mailer m;
             std::string headers =
                 "X-Autoreply: auto-replied\r\n"
-                "X-Autorespond: auto-replied\r\n";
-            m.send (_from, to, headers + subj + "\r\n\r\n" + body);
+                "X-Autorespond: auto-replied\r\n"
+                "Auto-Submitted: auto-generated\r\n"
+                "Content-Type: text/plain; charset=\"utf-8\"\r\n";
+            m.send (_from, to, headers + "Subject: " + subj + "\r\n\r\n" + body);
         }
     }
 }

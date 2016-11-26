@@ -10,7 +10,7 @@ class FeriasMilter {
     std::string from () const;
     void from (const char *from);
     void rcpt (const char *rcpt);
-    void header (const char *header);
+    void header (const char *header, const char *value);
     void sendAutoreply();
  private:
     std::string _base_url;

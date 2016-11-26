@@ -25,7 +25,7 @@ sfsistat ferias_envrcpt (SMFICTX *ctx, char **argv) {
 
 sfsistat ferias_header (SMFICTX *ctx, char *headerf, char *headerv) {
     FeriasMilter *milter = (FeriasMilter *)smfi_getpriv (ctx);
-    if (milter) milter->header(headerf);
+    if (milter) milter->header(headerf, headerv);
     return SMFIS_CONTINUE;
 }
 
