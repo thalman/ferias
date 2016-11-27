@@ -69,6 +69,8 @@ struct smfiDesc feriasMilter =
 
 int main (int argc, char *argv[])
 {
+    if (! cfg_parse_commandline (argc, argv)) return 1;
+
     smfi_setconn ((char *)cfg_socket ());
     if (smfi_register(feriasMilter) == MI_FAILURE) {
         fprintf (stderr, "smfi_register failed\n");
