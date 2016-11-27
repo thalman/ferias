@@ -16,7 +16,7 @@ static size_t http_memory_write(void *ptr, size_t size, size_t nmemb, void *user
     if (!totalsize) return 0;
 
     struct httpMemoryBuffer *memory = (struct httpMemoryBuffer *)userdata;
-    char *mem;
+    char *mem = NULL;
     if (memory->buffer) {
         // check limit here?
         char *mem = (char *) realloc (memory->buffer, totalsize + memory->size + 1);
@@ -45,6 +45,7 @@ char *http_get (const char *url)
         curl_easy_setopt (curl, CURLOPT_URL, url);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, http_memory_write);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
 
         res = curl_easy_perform(curl);
 
