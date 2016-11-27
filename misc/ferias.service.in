@@ -1,0 +1,12 @@
+[Unit]
+Description=Ferias
+After=syslog.target network.target
+Before=postfix.service sendmail.service
+
+[Service]
+Type=simple
+ExecStart=@prefix@/sbin/ferias
+
+[Install]
+WantedBy=multi-user.target
+
