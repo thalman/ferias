@@ -62,6 +62,46 @@ std::string FeriasMilter::b64decode(const std::string &in)
     return out;
 }
 
+/*
+  expected json reply
+  
+  {
+    "active" : true,
+    "subject" : "I'm not home",
+    "body" : "DDFSdsSFSew443yr=="
+  }
+*/
+
+typedef struct _json_reply_t {
+    int active;
+    std::string subj;
+    std::string body;
+} json_reply_t;
+
+int json_reply_callback (const char *locator, const char *value, void *data)
+{
+    if (! data) return 1;
+    json_reply_t *reply = (json_reply_t *)data;
+    if (strcmp (locator, "active")) {
+        reply->active = (strcmp (value, "true") == 0);
+    }
+    else if (strcmp (locator, "subject")) {
+        char *decoded = vsjson_decode_string (value);
+        if (decoded) {
+            reply -> subj = decoded;
+            free (decoded);
+        }
+    }
+    else if (strcmp (locator, "body")) {
+        char *decoded = vsjson_decode_string (value);
+        if (decoded) {
+            reply -> body = decoded;
+            free (decoded);
+        }
+    }
+    return 0;
+}
+
 bool FeriasMilter::shouldSendAutoreply (const std::string &to, std::string &subj, std::string &body)
 {
     if (to.empty ()) return false;
@@ -70,54 +110,14 @@ bool FeriasMilter::shouldSendAutoreply (const std::string &to, std::string &subj
     std::string url = _base_url + "/autoreply/" + to;
     std::string json = http_get (url);
     if (json.empty ()) return false;
-    vsjson *vsj = vsjson_new (json.c_str ());
-    const char *token = vsjson_first_token (vsj);
-    while (token) {
-        if (streq (token, "\"active\"")) {
-            token = vsjson_next_token (vsj);
-            if (!token || !streq (token, ":")) break;
-            token = vsjson_next_token (vsj);
-            if (token && !streq (token, "1")) {
-                active = true;
-            } else {
-                active = false;
-                break;
-            }
-        }
-        else if (strcmp (token, "\"subject\"") == 0) {
-            token = vsjson_next_token (vsj);
-            if (!token || !streq (token, ":")) {
-                active = false;
-                break;
-            }
-            token = vsjson_next_token (vsj);
-            if (token && token[0] == '"') {
-                subj = token[1];
-                subj.pop_back();
-            } else {
-                active = false;
-                break;
-            }
-        }
-        else if (strcmp (token, "\"body\"") == 0) {
-            token = vsjson_next_token (vsj);
-            if (!token || !streq (token, ":")) {
-                active = false;
-                break;
-            }
-            token = vsjson_next_token (vsj);
-            if (token && token[0] == '"') {
-                body = token[1];
-                body.pop_back();
-                body = b64decode (body);
-            } else {
-                active = false;
-                break;
-            }
-        }
-        token = vsjson_next_token (vsj);
+    json_reply_t json_reply;
+    vsjson_parse (json.c_str (), json_reply_callback, &json_reply);
+
+    active = json_reply.active;
+    if (active) {
+        subj = json_reply.subj;
+        body = b64decode (json_reply.body);
     }
-    vsjson_destroy (&vsj);
     return active;
 }
 

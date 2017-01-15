@@ -1,3 +1,12 @@
+/*
+ * ----------------------------------------------------------------------------
+ * "THE BEER-WARE LICENSE" (Revision 42):
+ * <tomas@halman.net> wrote this file.  As long as you retain this notice you
+ * can do whatever you want with this stuff. If we meet some day, and you think
+ * this stuff is worth it, you can buy me a beer in return.   Tomas Halman
+ * ----------------------------------------------------------------------------
+ */
+
 #ifndef __VSJSON_H
 #define __VSJSON_H
 
@@ -5,21 +14,24 @@
 extern "C" {
 #endif
 
-typedef struct vsjson vsjson;
+#define VSJSON_SEPARATOR '/'
+
+typedef struct _vsjson_t vsjson_t;
+typedef int (vsjson_callback_t)(const char *locator, const char *value, void *data);
 
 // minimalized json parser class
 // returns new parser object
 // parameter is json string
 // call vsjson_destroy to free the parser
-vsjson *vsjson_new (const char *json);
+vsjson_t *vsjson_new (const char *json);
 
 // destructor of json parser
-void vsjson_destroy (vsjson **self_p);
+void vsjson_destroy (vsjson_t **self_p);
 
 // get first json token, usually "[" or "{"
 // tokens are [ ] { } , : string (quote included)
 // number or keyword like null
-const char* vsjson_first_token (vsjson *self);
+const char* vsjson_first_token (vsjson_t *self);
 
 // get next json token
 // walk trough json like this:
@@ -31,7 +43,15 @@ const char* vsjson_first_token (vsjson *self);
 //     }
 //     printf ("\n");
 //     vsjson_destroy (&parser);
-const char* vsjson_next_token (vsjson *self);
+const char* vsjson_next_token (vsjson_t *self);
+
+int vsjson_walk_trough (vsjson_t *self, vsjson_callback_t *func, void *data);
+
+int vsjson_parse (const char *json, vsjson_callback_t *func, void *data);
+
+char *vsjson_decode_string (const char *string);
+
+char *vsjson_encode_string (const char *string);
 
 #ifdef __cplusplus
 }
